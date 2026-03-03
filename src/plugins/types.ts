@@ -369,6 +369,12 @@ export type PluginHookBeforePromptBuildEvent = {
 export type PluginHookBeforePromptBuildResult = {
   systemPrompt?: string;
   prependContext?: string;
+  /**
+   * If returned, replaces the session's active message history for this run only.
+   * The original messages are NOT mutated on disk — this is a per-run override.
+   * Use this for engineered context windows: time-filtering, image pruning, etc.
+   */
+  messages?: AgentMessage[];
 };
 
 // before_agent_start hook (legacy compatibility: combines both phases)

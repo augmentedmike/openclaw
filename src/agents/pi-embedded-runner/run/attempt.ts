@@ -458,6 +458,8 @@ export async function resolvePromptBuildHookResult(params: {
     prependContext: [promptBuildResult?.prependContext, legacyResult?.prependContext]
       .filter((value): value is string => Boolean(value))
       .join("\n\n"),
+    // before_prompt_build takes precedence; legacy hook may also supply messages.
+    messages: promptBuildResult?.messages ?? legacyResult?.messages,
   };
 }
 
@@ -1379,6 +1381,14 @@ export async function runEmbeddedAttempt(
             applySystemPromptOverrideToSession(activeSession, legacySystemPrompt);
             systemPromptText = legacySystemPrompt;
             log.debug(`hooks: applied systemPrompt override (${legacySystemPrompt.length} chars)`);
+          }
+          // Allow plugins to supply an engineered message window for this run.
+          // This is a per-run replacement only — the session JSONL is not modified.
+          if (hookResult?.messages && Array.isArray(hookResult.messages)) {
+            activeSession.agent.replaceMessages(hookResult.messages);
+            log.debug(
+              `hooks: replaced session messages from plugin (${hookResult.messages.length} messages)`,
+            );
           }
         }
 

@@ -17,8 +17,18 @@ type RegisteredPluginCommand = OpenClawPluginCommandDefinition & {
   pluginId: string;
 };
 
-// Registry of plugin commands
-const pluginCommands: Map<string, RegisteredPluginCommand> = new Map();
+// Use globalThis-shared Map so commands registered in any module instance
+// (main gateway process or worker) are visible across all of them.
+const COMMANDS_MAP_KEY = Symbol.for("openclaw.pluginCommandsMap");
+const pluginCommands: Map<string, RegisteredPluginCommand> = (() => {
+  const g = globalThis as typeof globalThis & {
+    [COMMANDS_MAP_KEY]?: Map<string, RegisteredPluginCommand>;
+  };
+  if (!g[COMMANDS_MAP_KEY]) {
+    g[COMMANDS_MAP_KEY] = new Map();
+  }
+  return g[COMMANDS_MAP_KEY];
+})();
 
 // Lock to prevent modifications during command execution
 let registryLocked = false;

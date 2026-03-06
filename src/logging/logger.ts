@@ -404,7 +404,12 @@ function pruneOldRollingLogs(dir: string): void {
       if (!entry.isFile()) {
         continue;
       }
-      if (!entry.name.startsWith(`${LOG_PREFIX}-`) || !entry.name.endsWith(LOG_SUFFIX)) {
+      // Match both active logs (openclaw-YYYY-MM-DD.log) and rotated backups (openclaw-YYYY-MM-DD.log.N)
+      const isActiveLog =
+        entry.name.startsWith(`${LOG_PREFIX}-`) && entry.name.endsWith(LOG_SUFFIX);
+      const isRotatedBackup =
+        entry.name.startsWith(`${LOG_PREFIX}-`) && /\.log\.\d+$/.test(entry.name);
+      if (!isActiveLog && !isRotatedBackup) {
         continue;
       }
       const fullPath = path.join(dir, entry.name);

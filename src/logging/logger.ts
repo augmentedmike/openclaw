@@ -178,6 +178,14 @@ function buildLogger(settings: ResolvedSettings): TsLogger<LogObj> {
           if (appendLogLine(settings.file, noticePayload)) {
             currentFileBytes += Buffer.byteLength(noticePayload, "utf8");
           }
+          // Write the triggering payload to the fresh log file and return early.
+          // Do NOT fall through to the bottom where currentFileBytes = nextBytes
+          // (nextBytes is the pre-rotation stale value and would immediately
+          // re-trigger rotation on the very next write).
+          if (appendLogLine(settings.file, payload)) {
+            currentFileBytes += payloadBytes;
+          }
+          return;
         } else {
           // Rotation disabled (maxBackups=0): suppress writes and warn once
           if (!warnedAboutSizeCap) {

@@ -494,7 +494,7 @@ by Peter Steinberger and the community.
 
 Real-world examples of what you can build on top of OpenClaw:
 
-- **[MiniClaw](https://miniclaw.bot)** — A personal AI OS for Mac. Personality, memory, plugins, cron jobs, email, SEO automation, and a project board — all running on your own hardware. Built by [@augmentedmike](https://github.com/augmentedmike).
+- **[MiniClaw](https://miniclaw.bot)** ([GitHub](https://github.com/augmentedmike/miniclaw-os)) — A personal AI OS for Mac. Personality, memory, plugins, cron jobs, email, SEO automation, and a project board — all running on your own hardware. Built by [@augmentedmike](https://github.com/augmentedmike).
 
 ## Community
 
@@ -568,10 +568,10 @@ Thanks to all clawtributors:
 
 ## Part of the AugmentedMike Ecosystem
 
-| | |
-|---|---|
-| 🦞 **MiniClaw** | [miniclaw.bot](https://miniclaw.bot) — The technology behind AM and a popular OpenClaw plugin ecosystem |
-| 👋 **Amelia** | [helloam.bot](https://helloam.bot) — Your personal AI companion |
-| 👨‍💻 **Michael ONeal** | [augmentedmike.com](https://augmentedmike.com) — The engineer behind it all |
-| 📖 **AM Blog** | [blog.augmentedmike.com](https://blog.augmentedmike.com) — Comic strip dev log |
-| 💻 **GitHub** | [github.com/augmentedmike](https://github.com/augmentedmike) |
+|                      |                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------- |
+| 🦞 **MiniClaw**      | [miniclaw.bot](https://miniclaw.bot) — The technology behind AM and a popular OpenClaw plugin ecosystem |
+| 👋 **Amelia**        | [helloam.bot](https://helloam.bot) — Your personal AI companion                                         |
+| 👨‍💻 **Michael ONeal** | [augmentedmike.com](https://augmentedmike.com) — The engineer behind it all                             |
+| 📖 **AM Blog**       | [blog.augmentedmike.com](https://blog.augmentedmike.com) — Comic strip dev log                          |
+| 💻 **GitHub**        | [github.com/augmentedmike](https://github.com/augmentedmike)                                            |

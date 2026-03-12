@@ -1,9 +1,24 @@
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { loadConfig } from "../config/config.js";
 import { resolveCommitHash } from "../infra/git-commit.js";
 import { visibleWidth } from "../terminal/ansi.js";
 import { isRich, theme } from "../terminal/theme.js";
 import { hasRootVersionAlias } from "./argv.js";
 import { pickTagline, type TaglineMode, type TaglineOptions } from "./tagline.js";
+
+// Read MiniClaw version from installed MANIFEST.json
+function getMiniClawVersion(): string {
+  const stateDir = process.env.OPENCLAW_STATE_DIR || path.join(os.homedir(), ".openclaw");
+  const manifestPath = path.join(stateDir, "miniclaw", "MANIFEST.json");
+  try {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    return manifest.version || "?";
+  } catch {
+    return "?";
+  }
+}
 
 type BannerOptions = TaglineOptions & {
   argv?: string[];
@@ -62,8 +77,11 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
   const commitLabel = commit ?? "unknown";
   const tagline = pickTagline({ ...options, mode: resolveTaglineMode(options) });
   const rich = options.richTty ?? isRich();
-  const title = "🦞 OpenClaw";
-  const prefix = "🦞 ";
+  const argv = options.argv ?? process.argv;
+  const isMiniClaw = argv.some((a) => a.startsWith("mc-"));
+  const mcVer = isMiniClaw ? getMiniClawVersion() : null;
+  const title = isMiniClaw ? `🦀 MiniClaw ${mcVer}` : "🦞 OpenClaw";
+  const prefix = isMiniClaw ? "🦀 " : "🦞 ";
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainBaseLine = `${title} ${version} (${commitLabel})`;
   const plainFullLine = tagline ? `${plainBaseLine} — ${tagline}` : plainBaseLine;
@@ -108,8 +126,16 @@ const LOBSTER_ASCII = [
 ];
 
 export function formatCliBannerArt(options: BannerOptions = {}): string {
+  const argv = options.argv ?? process.argv;
+  const isMiniClaw = argv.some((a) => a.startsWith("mc-"));
   const rich = options.richTty ?? isRich();
+
   if (!rich) {
+    if (isMiniClaw) {
+      return LOBSTER_ASCII.map((line) =>
+        line.includes("OPENCLAW") ? "                  🦀 MINICLAW 🦀                    " : line,
+      ).join("\n");
+    }
     return LOBSTER_ASCII.join("\n");
   }
 
@@ -128,11 +154,13 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
 
   const colored = LOBSTER_ASCII.map((line) => {
     if (line.includes("OPENCLAW")) {
+      const emoji = isMiniClaw ? "🦀" : "🦞";
+      const name = isMiniClaw ? " MINICLAW " : " OPENCLAW ";
       return (
         theme.muted("              ") +
-        theme.accent("🦞") +
-        theme.info(" OPENCLAW ") +
-        theme.accent("🦞")
+        theme.accent(emoji) +
+        theme.info(name) +
+        theme.accent(emoji)
       );
     }
     return splitGraphemes(line).map(colorChar).join("");

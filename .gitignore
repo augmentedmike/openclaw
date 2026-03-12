@@ -2,9 +2,8 @@ node_modules
 **/node_modules/
 .env
 docker-compose.extra.yml
-# dist and pnpm-lock.yaml tracked in fork for npm install from GitHub
-# dist
-# pnpm-lock.yaml
+dist
+pnpm-lock.yaml
 bun.lock
 bun.lockb
 coverage

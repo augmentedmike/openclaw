@@ -1,1 +1,1 @@
-"use strict"; module.exports = require("./index.js");
+"use strict"; try { module.exports = require("../llm-task.js"); } catch { module.exports = require("./index.js"); }

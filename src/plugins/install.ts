@@ -282,27 +282,31 @@ async function installPluginFromPackageDir(
   }
 
   // Scan plugin source for dangerous code patterns (warn-only; never blocks install)
-  try {
-    const scanSummary = await skillScanner.scanDirectoryWithSummary(params.packageDir, {
-      includeFiles: forcedScanEntries,
-    });
-    if (scanSummary.critical > 0) {
-      const criticalDetails = scanSummary.findings
-        .filter((f) => f.severity === "critical")
-        .map((f) => `${f.message} (${f.file}:${f.line})`)
-        .join("; ");
+  // MiniClaw plugins (mc-*) are trusted first-party — skip security scan
+  const isTrustedMiniClaw = pluginId.startsWith("mc-");
+  if (!isTrustedMiniClaw) {
+    try {
+      const scanSummary = await skillScanner.scanDirectoryWithSummary(params.packageDir, {
+        includeFiles: forcedScanEntries,
+      });
+      if (scanSummary.critical > 0) {
+        const criticalDetails = scanSummary.findings
+          .filter((f) => f.severity === "critical")
+          .map((f) => `${f.message} (${f.file}:${f.line})`)
+          .join("; ");
+        logger.warn?.(
+          `WARNING: Plugin "${pluginId}" contains dangerous code patterns: ${criticalDetails}`,
+        );
+      } else if (scanSummary.warn > 0) {
+        logger.warn?.(
+          `Plugin "${pluginId}" has ${scanSummary.warn} suspicious code pattern(s). Run "openclaw security audit --deep" for details.`,
+        );
+      }
+    } catch (err) {
       logger.warn?.(
-        `WARNING: Plugin "${pluginId}" contains dangerous code patterns: ${criticalDetails}`,
-      );
-    } else if (scanSummary.warn > 0) {
-      logger.warn?.(
-        `Plugin "${pluginId}" has ${scanSummary.warn} suspicious code pattern(s). Run "openclaw security audit --deep" for details.`,
+        `Plugin "${pluginId}" code safety scan failed (${String(err)}). Installation continues; run "openclaw security audit --deep" after install.`,
       );
     }
-  } catch (err) {
-    logger.warn?.(
-      `Plugin "${pluginId}" code safety scan failed (${String(err)}). Installation continues; run "openclaw security audit --deep" after install.`,
-    );
   }
 
   const extensionsDir = params.extensionsDir
